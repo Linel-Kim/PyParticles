@@ -1,0 +1,16 @@
+이 리포지토리는 simon-r의 PyParticles 패키지가
+python 3.6 및 윈도우 64비트 환경에서 작동할 수 있도록 수정한 것입니다.
+
+참고로 window에서 일부 오류의 경우
+패키지가 의존하는 일부 패키지의 컴파일이 충분히 잘 처리되지 않아 발생하는 문제입니다.
+
+https://stackoverflow.com/questions/26700719/pyopengl-glutinit-nullfunctionerror/32995139#32995139
+
+https://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+를 참조하시면 도움이 될 것 입니다.
+
+한글 사용설명도 차츰 추가할 예정이고, 소소한 기능 개선도 할 예정입니다.
+
+원본의 0.3.5 버전에 기반하며 추후 개선사항이 있는 경우
+patch_notes를 참조해 주시면 좋겠습니다.
