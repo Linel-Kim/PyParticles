@@ -49,6 +49,7 @@ class AxisOgl(object):
     axis_len = property( get_axis_len , set_axis_len )
     
     def draw_axis( self ):
+        self.ogl_init()
         glCallList( self.__dl_axis )
     
        

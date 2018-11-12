@@ -49,60 +49,80 @@ class ParticlesSet(object):
                  log_X=False , log_V=False , log_max_size=0 , dtype=np.float64 ):
         
         if size < 0 :
-            raise
-        
+            exit(1)
+
         self.__dtype = dtype
-        
+
         self.__X = np.zeros((size,dim) , dtype=dtype )
-        
+        self.__property_dict = dict()
+        self.__property_dict['X'] = self.__X
+
         if velocity:
             self.__V = np.zeros((size,dim) , dtype=dtype )
+            self.__property_dict['V'] = self.__V
+            self.velo = True
         else:
             self.__V = None
-        
+            self.velo =False
+
         if mass :
             self.__mass = np.zeros((size,1) , dtype=dtype )
+            self.__property_dict['M'] = self.__mass
+            self.mas = True
         else:
             self.__mass = None
-        
+            self.mas = False
+
         if charge :
             self.__Q = np.zeros(( size , 1 ) , dtype=dtype )
+            self.__property_dict['Q'] = self.__Q
+            self.charged =True
         else:
             self.__Q = None
-        
+            self.charged = False
+
         if not label :
             self.__label = None
         else:
             self.__label = list( "" for i in range(size) )
-        
+            self.__property_dict['label'] = self.__label
+
         self.__size = int( size )
         self.__dim  = int( dim )
         self.__centre_mass = None
-        
+
         self.__bound = boundary
-        
+
         self.__unit = 1.0
         self.__mass_unit = 1.0
-                
+
         self.__log = dict()
         self.__default_logger = None
-        
-        self.__property_dict = dict()
-        self.__property_dict['X'] = self.__X
-        self.__property_dict['V'] = self.__V
-        
-        if self.__mass is not None :
-            self.__property_dict['M'] = self.__mass
-        
-        if self.__label is not None :
-            self.__property_dict['label'] = self.__label
-            
-        if self.__Q is not None :
-            self.__property_dict['Q'] = self.__Q
-        
+
         self.__notify_set_changed = []
         
-        
+    def add_particles(self, pset):
+        #add_particles function has input that pset(particles_set objects)
+        #and pset must have same args of constructer
+        #plz use custom args after use add_particles or edit this function
+        #add_particles function only guaranteed pre-excute to buildanimation
+        if pset.X[0,0]!=0:
+            self.__size = self.__size + pset.size
+            self.__X= np.append(self.__X, pset.X, axis=0)
+            if self.velo:
+                self.__V = np.append(self.__V, pset.V, axis=0)
+                self.__property_dict['V'] = self.__V
+            if self.charged:
+                self.__Q = np.append(self.__Q, pset.Q, axis=0)
+                self.__property_dict['Q'] = self.__Q
+            if self.mas:
+                self.__mass = np.append(self.__mass, pset.M, axis=0)
+                self.__property_dict['M'] = self.__mass
+            self.__property_dict['X'] = self.__X
+        else:
+            print("please, input obj. created by particles_set packages")
+            exit(1)
+
     def realloc( self , size , dim , boundary=None ,
                  label=False , mass=True , velocity=True , charge=False ,
                  log_X=False , log_V=False , log_max_size=0 ):

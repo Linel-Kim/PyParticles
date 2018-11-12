@@ -1,0 +1,198 @@
+1. ogl.axis_ogl에서 class AxisOgl의 draw_axis(self): 정의 변경
+
+glCallList(self.__dl_axis)
+
+에서
+
+self.ogl_init()
+glCallList(self.__dl_axis)
+
+로 수정
+
+: 수정이유 : 좌표축에 대한 정보를 저장하는 변수를 만들지 않고 호출하면 당연히 실행이 불가능함
+-OpenGL initialize 과정을 저장한 해당 클래스의 함수를 실행하는 행을 추가함.
+
+2. ogl.draw_particles_ogl에서
+class DrawParticlesGL(object):
+의
+def __init__(self,pset=None) 에서
+self.__log_indices = none을 
+self.enlog = False 로 수정함
+
+def draw_trajectory(self): 에서
+if self.__log_indices == None: 을
+if not self.enlog 로 수정함
+
+: 수정이유 : 논리연산을 위한 변수로 값을 가지는 변수를 두면 오류가 발생
+log(흔적남기기) 활성여부를 관리하는 변수를 추가함.
+
+3. pset.particles_set 에서
+52행의 raise를 exit(1) 로 변경함
+이는 과거 raise가 오류가 있는 상황에서 실행을 중지하는 함수로 사용되었으나,
+현 표준의 방향과 맞지 않아서, exit(1)로 함수를 변경하였음
+
+4. pset.particles_set 에서 
+ def __init__( self , size=1 , dim=3 , boundary=None ,
+                 label=False , mass=True , velocity=True , charge=False ,
+                 log_X=False , log_V=False , log_max_size=0 , dtype=np.float64 ):의 문장 구조 변경 및 변수 추가
+
+<before>
+
+    def __init__( self , size=1 , dim=3 , boundary=None ,
+                 label=False , mass=True , velocity=True , charge=False ,
+                 log_X=False , log_V=False , log_max_size=0 , dtype=np.float64 ):
+        
+        if size < 0 :
+            raise
+
+        self.__dtype = dtype
+
+        self.__X = np.zeros((size,dim) , dtype=dtype )
+
+        if velocity:
+            self.__V = np.zeros((size,dim) , dtype=dtype )
+        else:
+            self.__V = None
+
+        if mass :
+            self.__mass = np.zeros((size,1) , dtype=dtype )
+        else:
+            self.__mass = None
+
+        if charge :
+            self.__Q = np.zeros(( size , 1 ) , dtype=dtype )
+        else:
+            self.__Q = None
+
+        if not label :
+            self.__label = None
+        else:
+            self.__label = list( "" for i in range(size) )
+
+        self.__size = int( size )
+        self.__dim  = int( dim )
+        self.__centre_mass = None
+
+        self.__bound = boundary
+
+        self.__unit = 1.0
+        self.__mass_unit = 1.0
+
+        self.__log = dict()
+        self.__default_logger = None
+
+        self.__property_dict = dict()
+        self.__property_dict['X'] = self.__X
+        self.__property_dict['V'] = self.__V
+
+        if self.__mass  != None :
+            self.__property_dict['M'] = self.__mass
+
+        if self.__label != None :
+            self.__property_dict['label'] = self.__label
+
+        if self.__Q != None :
+            self.__property_dict['Q'] = self.__Q
+        
+        self.__notify_set_changed = []
+
+<after>
+
+    def __init__( self , size=1 , dim=3 , boundary=None ,
+                 label=False , mass=True , velocity=True , charge=False ,
+                 log_X=False , log_V=False , log_max_size=0 , dtype=np.float64 ):
+        
+        if size < 0 :
+            exit(1)
+
+        self.__dtype = dtype
+
+        self.__X = np.zeros((size,dim) , dtype=dtype )
+        self.__property_dict = dict()
+        self.__property_dict['X'] = self.__X
+
+        if velocity:
+            self.__V = np.zeros((size,dim) , dtype=dtype )
+            self.__property_dict['V'] = self.__V
+            self.velo = True
+        else:
+            self.__V = None
+            self.velo =False
+
+        if mass :
+            self.__mass = np.zeros((size,1) , dtype=dtype )
+            self.__property_dict['M'] = self.__mass
+            self.mas = True
+        else:
+            self.__mass = None
+            self.mas = False
+
+        if charge :
+            self.__Q = np.zeros(( size , 1 ) , dtype=dtype )
+            self.__property_dict['Q'] = self.__Q
+            self.charged =True
+        else:
+            self.__Q = None
+            self.charged = False
+
+        if not label :
+            self.__label = None
+        else:
+            self.__label = list( "" for i in range(size) )
+            self.__property_dict['label'] = self.__label
+
+        self.__size = int( size )
+        self.__dim  = int( dim )
+        self.__centre_mass = None
+
+        self.__bound = boundary
+
+        self.__unit = 1.0
+        self.__mass_unit = 1.0
+
+        self.__log = dict()
+        self.__default_logger = None
+
+
+
+
+        self.__notify_set_changed = []
+
+:수정사유 :
+1. 우선 자료 유형의 정의를 윗줄로 옮겨서 자료 유형을 좀 더 쉽게 파악하게 개선-코드 가독성 개선
+2. 자료 변수 생성시 해당 자료 유형을 사용할 지의 여부를 확인하고 생성하게 해서 메모리에 존재하는 변수 갯수 최적화
+3. 자료 변수의 사용여부를 저장하는 변수를 추가로 만들었음. (이는 다음 수정사항인 자취 남기기 모듈에 필요한 개선점임)
+
+5. pset.logger 에서
+
+def __init__ (...) 에 변수 정의 추가
+
+self.enlog_X = log_X
+self.enlog_V = log_V
+self.ensim_time = sim_time
+
+수정사유 : 해당 자취를 남길지의 여부를 확인하고 해당 자료 변수를 생성한 후 해당 자취의 사용여부가 남아있지 않아 오류가 발생하여, 각 자취와 관련된 사용여부를 기록할 변수 추가.
+
+6. 5.의 수정사항을 바탕으로 해당 모듈에서 사용하는 변수를 알맞게 조정
+
+def log(self): 에서
+
+if self.__sim_time != None :
+-> if self.ensim_time != None:
+if self.__log_X != None :
+-> if self.enlog_X :
+if self.__log_V != None :
+-> if self.enlog_V :
+
+def get_log_X_enabled(self):를
+return self.__log_X != None
+-> return self.enlog_X
+로
+
+def get_log_V_enabled(self):를
+return self.__log_V != None
+-> return self.enlog_V
+
+7. pset.particles_set 에 add_particles 함수 추가
+particles set 변수들을 합치는 기능 수행 : 기본 변수 이외 다른 변수가 있는 경우
+사용시 이 함수에 해당 내용을 추가하거나, 아니면 실행 코드에서 함수를 새로 정의할 것
