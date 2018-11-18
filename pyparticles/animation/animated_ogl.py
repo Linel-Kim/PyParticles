@@ -171,6 +171,11 @@ def DrawGLScene():
         
     glPopMatrix()
     glutSwapBuffers()
+    if DrawGLScene.animation.ode_solver.steps_cnt == DrawGLScene.animation.steps :
+        glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_CONTINUE_EXECUTION)
+        glutDestroyWindow(1)
+        sys.argv=glutInit(sys.argv)
+        glutInit(sys.argv)
 
 
 def Set2DMode(  ):
@@ -606,6 +611,7 @@ class AnimatedGl( pan.Animation ):
         self.__window = None
         
         glutInit(sys.argv)
+        sys.argv = glutInit(sys.argv)
         
         glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
         glutInitWindowSize( self.win_size[0] , self.win_size[1] )

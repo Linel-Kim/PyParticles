@@ -1,0 +1,9 @@
+1. animation.animated_ogl
+
+DrawGLScene():
+에 step 만료시 탈출을 위한 코드 추가
+(GLUT 창 종료후 탈출시 다시 재 진입이 안 되는 듯?)
+(glutInit(sys.argv)를 실행 코드에 첨가하면 이슈 해결되지 않을까 실험 예정)
+
+https://stackoverflow.com/questions/26785751/calling-a-freeglut-function-in-pyopengl-prints-freeglut-and-exits
+참조해 glutInit 구조 개선 예정
