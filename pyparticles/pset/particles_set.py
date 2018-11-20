@@ -106,7 +106,7 @@ class ParticlesSet(object):
         #and pset must have same args of constructer
         #plz use custom args after use add_particles or edit this function
         #add_particles function only guaranteed pre-excute to buildanimation
-        if pset.X[0,0]!=0:
+        if pset.size!=0:
             self.__size = self.__size + pset.size
             self.__X= np.append(self.__X, pset.X, axis=0)
             if self.velo:
